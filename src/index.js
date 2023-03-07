@@ -16,8 +16,17 @@ function onSearch(event) {
   event.preventDefault();
 
   picsApiService.query = event.currentTarget.elements.searchQuery.value;
+
+  if (picsApiService.query === '') {
+    return Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
   picsApiService.resetPage();
-  picsApiService.fetchPics().then(appendPicsMarkup);
+  picsApiService.fetchPics().then(hits => {
+    clearGallery();
+    appendPicsMarkup(hits);
+  });
 }
 
 function onLoadMore() {
@@ -26,9 +35,18 @@ function onLoadMore() {
 
 function appendPicsMarkup(hits) {
   const markup = hits
-    .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-      return `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `<div class="photo-card">
+  <a href="${largeImageURL}"><img src="${webformatURL}" alt="${tags}" loading="lazy" width=320 height=240/></a>
   <div class="info">
     <p class="info-item">
       <b>Likes: ${likes}</b>
@@ -44,10 +62,18 @@ function appendPicsMarkup(hits) {
     </p>
   </div>
 </div>`;
-    })
+      }
+    )
     .join('');
   galleryEl.insertAdjacentHTML('beforeend', markup);
   //   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
-  //   let lightbox = new Simplelightbox(galleryEl);
+  let lightbox = new Simplelightbox('.gallery a', {
+    captionDelay: 250,
+    captionsData: 'alt',
+  });
   //   galleryEl.refresh();
+}
+
+function clearGallery() {
+  galleryEl.innerHTML = '';
 }

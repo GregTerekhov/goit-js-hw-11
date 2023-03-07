@@ -1,6 +1,15 @@
 body {
   margin: 0;
-  background-color: aliceblue;
+  background-color: rgb(199, 228, 252);
+}
+
+button {
+  border-radius: 4px;
+  width: 120px;
+  padding: 6px 8px;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
 .wrapper {
@@ -15,16 +24,42 @@ body {
 }
 
 .search-form > button {
-  cursor: pointer;
+  color: #2f55ee;
+  background-color: aliceblue;
+}
+
+.search-form > button:hover,
+.search-form > button:focus,
+.search-form > button:active {
+  background-color: rgb(195, 226, 254);
 }
 
 .search-form > input {
   width: 200px;
 }
 
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  object-fit: cover;
+}
+
 .load-more {
-  cursor: pointer;
+  margin-top: 24px;
+  background-color: #2f55ee;
+  color: aliceblue;
   margin-left: auto;
   margin-right: auto;
-  display: flex;
+  display: block;
+}
+
+.load-more:hover,
+.load-more:focus,
+.load-more:active {
+  background-color: #4568f8;
 }

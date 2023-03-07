@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
 export class PicsApiService {
   constructor() {
     this.searchQuery = '';
@@ -7,9 +9,7 @@ export class PicsApiService {
   }
 
   async fetchPics() {
-    const BASE_URL = 'https://pixabay.com/api/';
-    const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
-    const GET_CONFIG = `&category=backgrounds&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`;
+    const GET_CONFIG = `&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`;
 
     try {
       const response = await axios.get(
