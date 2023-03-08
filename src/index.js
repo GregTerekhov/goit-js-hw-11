@@ -23,10 +23,12 @@ function onSearch(event) {
       'Sorry, there are no images matching your search query. Please try again.'
     );
   }
+  Notiflix.Notify.success('Hooray! We found totalHits images.');
   loadMoreBtn.disabled = false;
   picsApiService.resetPage();
   clearGallery();
   fetchResult();
+  galleryEl.refresh();
 }
 
 function fetchResult() {
