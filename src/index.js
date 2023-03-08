@@ -10,7 +10,7 @@ const loadMoreBtn = document.querySelector('.load-more');
 const picsApiService = new PicsApiService();
 
 formEl.addEventListener('submit', onSearch);
-loadMoreBtn.addEventListener('click', onLoadMore);
+loadMoreBtn.addEventListener('click', fetchResult);
 loadMoreBtn.classList.add('is-hidden');
 
 function onSearch(event) {
@@ -23,17 +23,18 @@ function onSearch(event) {
       'Sorry, there are no images matching your search query. Please try again.'
     );
   }
-
+  loadMoreBtn.disabled = false;
   picsApiService.resetPage();
-  picsApiService.fetchPics().then(hits => {
-    clearGallery();
-    appendPicsMarkup(hits);
-  });
+  clearGallery();
+  fetchResult();
 }
 
-function onLoadMore() {
-  picsApiService.fetchPics().then(appendPicsMarkup);
+function fetchResult() {
   loadMoreBtn.disabled = true;
+  picsApiService.fetchPics().then(hits => {
+    loadMoreBtn.disabled = false;
+    appendPicsMarkup(hits);
+  });
 }
 
 function appendPicsMarkup(hits) {
