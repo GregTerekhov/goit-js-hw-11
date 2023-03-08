@@ -39,8 +39,15 @@ button {
 }
 
 .gallery {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 20px;
+  padding: 0;
+  margin: 0;
+  max-width: calc(100vw - 80px);
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 24px;
 }
 
 .gallery img {
@@ -56,10 +63,15 @@ button {
   margin-left: auto;
   margin-right: auto;
   display: block;
+  margin-bottom: 24px;
 }
 
 .load-more:hover,
 .load-more:focus,
 .load-more:active {
   background-color: #4568f8;
+}
+
+.load-more.is-hidden {
+  display: none;
 }

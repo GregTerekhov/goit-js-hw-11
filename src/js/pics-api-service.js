@@ -9,15 +9,24 @@ export class PicsApiService {
   }
 
   async fetchPics() {
-    const GET_CONFIG = `&image_type=photo&orientation=horizontal&safesearch=true&per_page=40&page=${this.page}`;
+    const params = new URLSearchParams({
+      key: API_KEY,
+      q: this.searchQuery,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      per_page: 40,
+      page: this.page,
+    });
 
     try {
-      const response = await axios.get(
-        `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}${GET_CONFIG}`
-      );
-      const result = response.data;
+      const {
+        data: { hits },
+      } = await axios.get(BASE_URL, { params });
+
       this.incrementPage();
-      return result.hits;
+
+      return hits;
     } catch (error) {
       return console.error(error);
     }
@@ -32,7 +41,7 @@ export class PicsApiService {
   }
 
   get query() {
-    return this.query;
+    return this.searchQuery;
   }
 
   set query(newQuery) {

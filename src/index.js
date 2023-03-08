@@ -11,6 +11,7 @@ const picsApiService = new PicsApiService();
 
 formEl.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', onLoadMore);
+loadMoreBtn.classList.add('is-hidden');
 
 function onSearch(event) {
   event.preventDefault();
@@ -22,6 +23,7 @@ function onSearch(event) {
       'Sorry, there are no images matching your search query. Please try again.'
     );
   }
+
   picsApiService.resetPage();
   picsApiService.fetchPics().then(hits => {
     clearGallery();
@@ -31,6 +33,7 @@ function onSearch(event) {
 
 function onLoadMore() {
   picsApiService.fetchPics().then(appendPicsMarkup);
+  loadMoreBtn.disabled = true;
 }
 
 function appendPicsMarkup(hits) {
@@ -69,9 +72,9 @@ function appendPicsMarkup(hits) {
   //   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
   let lightbox = new Simplelightbox('.gallery a', {
     captionDelay: 250,
-    captionsData: 'alt',
   });
   //   galleryEl.refresh();
+  loadMoreBtn.classList.remove('is-hidden');
 }
 
 function clearGallery() {
