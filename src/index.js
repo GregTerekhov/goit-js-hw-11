@@ -1,6 +1,7 @@
 import Simplelightbox from 'simplelightbox';
 import { PicsApiService } from './js/pics-api-service';
 import Notiflix from 'notiflix';
+import throttle from 'lodash.throttle';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('.search-form');
@@ -15,6 +16,18 @@ let lightbox = new Simplelightbox('.gallery a', {
 
 formEl.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', fetchResult);
+window.addEventListener(
+  'scroll',
+  () => {
+    const documentRect = galleryEl.getBoundingClientRect();
+
+    if (documentRect.bottom <= document.documentElement.clientHeight + 300) {
+      picsApiService.page += 1;
+      fetchResult();
+    }
+  },
+  1000
+);
 
 loadMoreBtn.classList.add('is-hidden');
 
@@ -27,10 +40,6 @@ function onSearch(event) {
   clearGallery();
   fetchResult();
 }
-
-// const loadingPics = (page = 1) => {
-//   fetch('https://pixabay.com/api/');
-// };
 
 function fetchResult() {
   loadMoreBtn.disabled = true;
@@ -51,6 +60,7 @@ function fetchResult() {
       appendPicsMarkup({ hits });
       Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
       lightbox.refresh();
+      smoothScroll();
     }
   });
 }
@@ -61,7 +71,7 @@ function smoothScroll() {
     .firstElementChild.getBoundingClientRect();
 
   window.scrollBy({
-    top: cardHeight * 0.3,
+    top: cardHeight * 0.35,
     behavior: 'smooth',
   });
 }
@@ -100,7 +110,6 @@ function appendPicsMarkup({ hits }) {
     .join('');
   galleryEl.insertAdjacentHTML('beforeend', markup);
   loadMoreBtn.classList.remove('is-hidden');
-  smoothScroll();
 }
 
 function clearGallery() {

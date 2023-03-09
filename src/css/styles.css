@@ -3,6 +3,11 @@ body {
   background-color: rgb(199, 228, 252);
 }
 
+p {
+  padding: 0;
+  margin: 8px 16px;
+}
+
 button {
   border-radius: 4px;
   width: 120px;
@@ -41,7 +46,7 @@ button {
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-gap: 20px;
+  grid-gap: 32px;
   padding: 0;
   margin: 0;
   max-width: calc(100vw - 80px);
@@ -57,9 +62,20 @@ button {
   object-fit: cover;
 }
 
+.photo-card {
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  transition: transform 250ms ease-out;
+  overflow: hidden;
+}
+
+.photo-card:hover {
+  transform: scale(1.05);
+}
+
 .info {
   display: grid;
-  grid-template-columns: 150px 150px;
+  grid-template-columns: 150px 172px;
 }
 
 .load-more {
