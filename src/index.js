@@ -8,38 +8,65 @@ const galleryEl = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
 const picsApiService = new PicsApiService();
+// const infiniteScroll = new IntersectionObserver();
+let lightbox = new Simplelightbox('.gallery a', {
+  captionDelay: 250,
+});
 
 formEl.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', fetchResult);
+
 loadMoreBtn.classList.add('is-hidden');
 
 function onSearch(event) {
   event.preventDefault();
 
   picsApiService.query = event.currentTarget.elements.searchQuery.value;
-
-  if (picsApiService.query === '') {
-    return Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-  }
-  Notiflix.Notify.success('Hooray! We found totalHits images.');
   loadMoreBtn.disabled = false;
   picsApiService.resetPage();
   clearGallery();
   fetchResult();
-  galleryEl.refresh();
 }
+
+// const loadingPics = (page = 1) => {
+//   fetch('https://pixabay.com/api/');
+// };
 
 function fetchResult() {
   loadMoreBtn.disabled = true;
-  picsApiService.fetchPics().then(hits => {
-    loadMoreBtn.disabled = false;
-    appendPicsMarkup(hits);
+  picsApiService.fetchPics().then(({ hits, totalHits }) => {
+    if (!hits.length || hits.length <= 3) {
+      loadMoreBtn.classList.add('is-hidden');
+      return Notiflix.Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+    if (hits.length === totalHits) {
+      loadMoreBtn.classList.add('is-hidden');
+      Notiflix.Notify.warning(
+        "We're sorry, but you've reached the end of search results."
+      );
+    } else {
+      loadMoreBtn.disabled = false;
+      appendPicsMarkup({ hits });
+      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+      lightbox.refresh();
+    }
   });
 }
 
-function appendPicsMarkup(hits) {
+function smoothScroll() {
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 0.3,
+    behavior: 'smooth',
+  });
+}
+
+function appendPicsMarkup({ hits }) {
   const markup = hits
     .map(
       ({
@@ -72,12 +99,8 @@ function appendPicsMarkup(hits) {
     )
     .join('');
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  //   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
-  let lightbox = new Simplelightbox('.gallery a', {
-    captionDelay: 250,
-  });
-  //   galleryEl.refresh();
   loadMoreBtn.classList.remove('is-hidden');
+  smoothScroll();
 }
 
 function clearGallery() {

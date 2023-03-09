@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
+export const BASE_URL = 'https://pixabay.com/api/';
+export const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
 export class PicsApiService {
   constructor() {
     this.searchQuery = '';
@@ -15,18 +15,18 @@ export class PicsApiService {
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: true,
-      per_page: 4, // змінити потім на 40
+      per_page: 40, // повернути 40
       page: this.page,
     });
 
     try {
       const {
-        data: { hits },
+        data: { hits, totalHits },
       } = await axios.get(BASE_URL, { params });
 
       this.incrementPage();
 
-      return hits;
+      return { hits, totalHits };
     } catch (error) {
       return console.error(error);
     }
