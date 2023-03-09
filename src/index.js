@@ -14,7 +14,7 @@ let lightbox = new Simplelightbox('.gallery a', {
 });
 
 formEl.addEventListener('submit', onSearch);
-loadMoreBtn.addEventListener('click', fetchResult);
+// loadMoreBtn.addEventListener('click', fetchResult);
 window.addEventListener(
   'scroll',
   throttle(() => {
@@ -22,8 +22,8 @@ window.addEventListener(
 
     if (documentRect.bottom <= document.documentElement.clientHeight + 300) {
       picsApiService.page += 1;
-      picsApiService.fetchPics().then(() => {
-        appendPicsMarkup();
+      picsApiService.fetchPics().then(({ hits }) => {
+        appendPicsMarkup({ hits });
         lightbox.refresh();
       });
     }
@@ -37,28 +37,28 @@ function onSearch(event) {
   event.preventDefault();
 
   picsApiService.query = event.currentTarget.elements.searchQuery.value;
-  loadMoreBtn.disabled = false;
+  //   loadMoreBtn.disabled = false;
   picsApiService.resetPage();
   clearGallery();
   fetchResult();
 }
 
 function fetchResult() {
-  loadMoreBtn.disabled = true;
+  //   loadMoreBtn.disabled = true;
   picsApiService.fetchPics().then(({ hits, totalHits }) => {
     if (!hits.length || hits.length <= 3) {
-      loadMoreBtn.classList.add('is-hidden');
+      //   loadMoreBtn.classList.add('is-hidden');
       return Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
     if (hits.length === totalHits) {
-      loadMoreBtn.classList.add('is-hidden');
+      //   loadMoreBtn.classList.add('is-hidden');
       Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     } else {
-      loadMoreBtn.disabled = false;
+      //   loadMoreBtn.disabled = false;
       appendPicsMarkup({ hits });
       Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
       lightbox.refresh();
@@ -111,7 +111,7 @@ function appendPicsMarkup({ hits }) {
     )
     .join('');
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  loadMoreBtn.classList.remove('is-hidden');
+  //   loadMoreBtn.classList.remove('is-hidden');
 }
 
 function clearGallery() {
