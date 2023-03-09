@@ -9,7 +9,6 @@ const galleryEl = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
 const picsApiService = new PicsApiService();
-// const infiniteScroll = new IntersectionObserver();
 let lightbox = new Simplelightbox('.gallery a', {
   captionDelay: 250,
 });
@@ -18,14 +17,17 @@ formEl.addEventListener('submit', onSearch);
 loadMoreBtn.addEventListener('click', fetchResult);
 window.addEventListener(
   'scroll',
-  () => {
+  throttle(() => {
     const documentRect = galleryEl.getBoundingClientRect();
 
     if (documentRect.bottom <= document.documentElement.clientHeight + 300) {
       picsApiService.page += 1;
-      fetchResult();
+      picsApiService.fetchPics().then(() => {
+        appendPicsMarkup();
+        lightbox.refresh();
+      });
     }
-  },
+  }),
   1000
 );
 
@@ -52,7 +54,7 @@ function fetchResult() {
     }
     if (hits.length === totalHits) {
       loadMoreBtn.classList.add('is-hidden');
-      Notiflix.Notify.warning(
+      Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     } else {
