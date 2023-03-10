@@ -1,37 +1,39 @@
 import Simplelightbox from 'simplelightbox';
 import { PicsApiService } from './js/pics-api-service';
 import Notiflix from 'notiflix';
-import throttle from 'lodash.throttle';
+import InfiniteScroll from './js/infinite-scroll';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+// const loadMoreBtn = document.querySelector('.load-more');
+const observedEl = document.querySelector('.sentinel');
 
 const picsApiService = new PicsApiService();
+
 let lightbox = new Simplelightbox('.gallery a', {
   captionDelay: 250,
 });
 
 formEl.addEventListener('submit', onSearch);
 // loadMoreBtn.addEventListener('click', fetchResult);
-window.addEventListener(
-  'scroll',
-  throttle(() => {
-    const documentRect = galleryEl.getBoundingClientRect();
 
-    if (documentRect.bottom <= document.documentElement.clientHeight + 300) {
-      picsApiService.page += 1;
+// loadMoreBtn.classList.add('is-hidden');
+
+const options = {
+  rootMargin: '150px',
+  history: false,
+};
+
+function onEntry(entries) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
       picsApiService.fetchPics().then(({ hits }) => {
         appendPicsMarkup({ hits });
-        lightbox.refresh();
       });
     }
-  }),
-  1000
-);
-
-loadMoreBtn.classList.add('is-hidden');
+  });
+}
 
 function onSearch(event) {
   event.preventDefault();
@@ -54,7 +56,7 @@ function fetchResult() {
     }
     if (hits.length === totalHits) {
       //   loadMoreBtn.classList.add('is-hidden');
-      Notiflix.Notify.info(
+      return Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     } else {
@@ -110,10 +112,14 @@ function appendPicsMarkup({ hits }) {
       }
     )
     .join('');
-  galleryEl.insertAdjacentHTML('beforeend', markup);
+
+  galleryEl.insertAdjacentHTML('afterbegin', markup);
   //   loadMoreBtn.classList.remove('is-hidden');
 }
 
 function clearGallery() {
   galleryEl.innerHTML = '';
 }
+
+const infScroll = new IntersectionObserver(onEntry, options);
+infScroll.observe(observedEl);

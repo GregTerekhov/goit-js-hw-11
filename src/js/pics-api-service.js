@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-export const BASE_URL = 'https://pixabay.com/api/';
-export const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
 export class PicsApiService {
   constructor() {
     this.searchQuery = '';
