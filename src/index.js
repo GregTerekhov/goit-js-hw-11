@@ -11,7 +11,8 @@ const observedEl = document.querySelector('.sentinel');
 const picsApiService = new PicsApiService();
 
 let lightbox = new Simplelightbox('.gallery a', {
-  captionDelay: 250,
+  captionDelay: 500,
+  captionsData: 'alt',
 });
 
 formEl.addEventListener('submit', onSearch);
@@ -22,6 +23,11 @@ function onSearch(event) {
   picsApiService.query = event.currentTarget.elements.searchQuery.value.trim();
   picsApiService.resetPage();
   clearGallery();
+  if (!picsApiService.query) {
+    return Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
   fetchResult();
 }
 
@@ -30,12 +36,8 @@ function fetchResult() {
   renderByRequest();
 }
 
-function onCheckEmptyInput(hits, totalHits) {
-  if (
-    picsApiService.query === '' ||
-    !hits.length ||
-    (totalHits === 0 && totalHits <= 2)
-  ) {
+function onCheckEmptyInput(totalHits) {
+  if (picsApiService.query === '' || totalHits <= 2) {
     return Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
@@ -43,10 +45,10 @@ function onCheckEmptyInput(hits, totalHits) {
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 }
 
-function renderByRequest() {
-  picsApiService.fetchPics().then(({ hits, totalHits }) => {
+async function renderByRequest() {
+  await picsApiService.fetchPics().then(({ hits, totalHits }) => {
     if (picsApiService.page === 1) {
-      onCheckEmptyInput(hits, totalHits);
+      onCheckEmptyInput(totalHits);
     }
 
     appendPicsMarkup(hits);
