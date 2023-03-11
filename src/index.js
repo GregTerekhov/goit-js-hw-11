@@ -8,6 +8,7 @@ const galleryEl = document.querySelector('.gallery');
 const observedEl = document.querySelector('.sentinel');
 
 const picsApiService = new PicsApiService();
+
 let lightbox = new Simplelightbox('.gallery a', {
   captionDelay: 250,
 });
@@ -17,7 +18,7 @@ formEl.addEventListener('submit', onSearch);
 function onSearch(event) {
   event.preventDefault();
 
-  picsApiService.query = event.currentTarget.elements.searchQuery.value;
+  picsApiService.query = event.currentTarget.elements.searchQuery.value.trim();
   picsApiService.resetPage();
   clearGallery();
   fetchResult();
@@ -33,7 +34,6 @@ function fetchResult() {
     }
     appendPicsMarkup(hits);
     Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-    picsApiService.incrementPage();
     lightbox.refresh();
     infScroll.observe(observedEl);
     smoothScroll();
@@ -42,6 +42,7 @@ function fetchResult() {
         "We're sorry, but you've reached the end of search results."
       );
     }
+    picsApiService.incrementPage();
   });
 }
 
@@ -109,11 +110,13 @@ const onEntry = entries => {
       picsApiService.fetchPics().then(({ hits, totalHits }) => {
         appendPicsMarkup(hits);
 
-        // if (picsApiService.page === Math.ceil(totalHits / 40)) {
-        //   return Notiflix.Notify.info(
-        //     "We're sorry, but you've reached the end of search results."
-        //   );
-        // }
+        if (picsApiService.page === Math.ceil(totalHits / 40)) {
+          infScroll.unobserve(observedEl);
+          return Notiflix.Notify.info(
+            "We're sorry, but you've reached the end of search results."
+          );
+        }
+        console.log(picsApiService.page);
         picsApiService.incrementPage();
         infScroll.observe(observedEl);
         lightbox.refresh();
