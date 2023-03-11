@@ -33,6 +33,13 @@ button {
   background-color: aliceblue;
 }
 
+.search-form > button:disabled {
+  opacity: 1;
+  background-color: rgb(180, 182, 183);
+  color: rgb(99, 99, 99);
+  pointer-events: none;
+}
+
 .search-form > button:hover,
 .search-form > button:focus,
 .search-form > button:active {
