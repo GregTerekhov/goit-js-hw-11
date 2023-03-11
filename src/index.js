@@ -6,6 +6,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const observedEl = document.querySelector('.sentinel');
+const wrapperFormEl = document.querySelector('.wrapper');
 
 const picsApiService = new PicsApiService();
 
@@ -26,33 +27,39 @@ function onSearch(event) {
 
 function fetchResult() {
   infScroll.unobserve(observedEl);
+  renderByRequest();
+}
+
+function onCheckEmptyInput(hits, totalHits) {
+  if (
+    picsApiService.query === '' ||
+    !hits.length ||
+    (totalHits === 0 && totalHits <= 2)
+  ) {
+    return Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
+  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+}
+
+function renderByRequest() {
   picsApiService.fetchPics().then(({ hits, totalHits }) => {
-    if (!hits.length || hits.length <= 3) {
-      return Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
+    if (picsApiService.page === 1) {
+      onCheckEmptyInput(hits, totalHits);
     }
+
     appendPicsMarkup(hits);
-    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
     lightbox.refresh();
     infScroll.observe(observedEl);
-    smoothScroll();
     if (picsApiService.page === Math.ceil(totalHits / 40)) {
+      infScroll.unobserve(observedEl);
+      lightbox.refresh();
       return Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
     }
     picsApiService.incrementPage();
-  });
-}
-
-function smoothScroll() {
-  const { height: cardHeight } =
-    galleryEl.firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 0.35,
-    behavior: 'smooth',
   });
 }
 
@@ -107,20 +114,7 @@ const onEntry = entries => {
       if (picsApiService.page === 1) {
         return;
       }
-      picsApiService.fetchPics().then(({ hits, totalHits }) => {
-        appendPicsMarkup(hits);
-
-        if (picsApiService.page === Math.ceil(totalHits / 40)) {
-          infScroll.unobserve(observedEl);
-          return Notiflix.Notify.info(
-            "We're sorry, but you've reached the end of search results."
-          );
-        }
-        console.log(picsApiService.page);
-        picsApiService.incrementPage();
-        infScroll.observe(observedEl);
-        lightbox.refresh();
-      });
+      renderByRequest();
     }
   });
 };
