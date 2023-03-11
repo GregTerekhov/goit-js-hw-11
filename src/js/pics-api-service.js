@@ -23,12 +23,16 @@ export class PicsApiService {
       const {
         data: { hits, totalHits },
       } = await axios.get(BASE_URL, { params });
-
-      this.incrementPage();
+      if (hits.length === totalHits) {
+        signal = controller.signal;
+      }
 
       return { hits, totalHits };
     } catch (error) {
-      return console.error(error);
+      if (error.response) {
+        controller.abort();
+      }
+      console.error(error);
     }
   }
 

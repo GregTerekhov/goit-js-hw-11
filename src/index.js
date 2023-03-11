@@ -1,56 +1,46 @@
 import Simplelightbox from 'simplelightbox';
 import { PicsApiService } from './js/pics-api-service';
 import Notiflix from 'notiflix';
-// import InfiniteScroll from './js/infinite-scroll';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
-// const loadMoreBtn = document.querySelector('.load-more');
 const observedEl = document.querySelector('.sentinel');
 
 const picsApiService = new PicsApiService();
-
 let lightbox = new Simplelightbox('.gallery a', {
   captionDelay: 250,
 });
 
 formEl.addEventListener('submit', onSearch);
-// loadMoreBtn.addEventListener('click', fetchResult);
-// loadMoreBtn.classList.add('is-hidden');
 
 function onSearch(event) {
   event.preventDefault();
 
   picsApiService.query = event.currentTarget.elements.searchQuery.value;
-  //   loadMoreBtn.disabled = false;
   picsApiService.resetPage();
   clearGallery();
   fetchResult();
-  regObserver();
 }
 
 function fetchResult() {
-  //   loadMoreBtn.disabled = true;
+  infScroll.unobserve(observedEl);
   picsApiService.fetchPics().then(({ hits, totalHits }) => {
     if (!hits.length || hits.length <= 3) {
-      //   loadMoreBtn.classList.add('is-hidden');
       return Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
     }
-    if (hits.length - 1 === totalHits) {
-      //   loadMoreBtn.classList.add('is-hidden');
+    appendPicsMarkup(hits);
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    picsApiService.incrementPage();
+    lightbox.refresh();
+    infScroll.observe(observedEl);
+    smoothScroll();
+    if (picsApiService.page === Math.ceil(totalHits / 40)) {
       return Notiflix.Notify.info(
         "We're sorry, but you've reached the end of search results."
       );
-    } else {
-      //   loadMoreBtn.disabled = false;
-      appendPicsMarkup({ hits });
-      picsApiService.incrementPage();
-      Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-      lightbox.refresh();
-      smoothScroll();
     }
   });
 }
@@ -65,7 +55,7 @@ function smoothScroll() {
   });
 }
 
-function appendPicsMarkup({ hits }) {
+function appendPicsMarkup(hits) {
   const markup = hits
     .map(
       ({
@@ -99,30 +89,38 @@ function appendPicsMarkup({ hits }) {
     .join('');
 
   galleryEl.insertAdjacentHTML('beforeend', markup);
-  //   loadMoreBtn.classList.remove('is-hidden');
 }
 
 function clearGallery() {
   galleryEl.innerHTML = '';
 }
 
-function regObserver() {
-  const options = {
-    rootMargin: '300px',
-    history: false,
-  };
+const options = {
+  rootMargin: '300px',
+  history: false,
+};
 
-  const onEntry = entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && picsApiService.query !== '') {
-        console.log('the end');
-        picsApiService.fetchPics().then(({ hits }) => {
-          appendPicsMarkup({ hits });
-        });
+const onEntry = entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && picsApiService.query !== '') {
+      if (picsApiService.page === 1) {
+        return;
       }
-    });
-  };
+      picsApiService.fetchPics().then(({ hits, totalHits }) => {
+        appendPicsMarkup(hits);
 
-  const infScroll = new IntersectionObserver(onEntry, options);
-  infScroll.observe(observedEl);
-}
+        // if (picsApiService.page === Math.ceil(totalHits / 40)) {
+        //   return Notiflix.Notify.info(
+        //     "We're sorry, but you've reached the end of search results."
+        //   );
+        // }
+        picsApiService.incrementPage();
+        infScroll.observe(observedEl);
+        lightbox.refresh();
+      });
+    }
+  });
+};
+
+const infScroll = new IntersectionObserver(onEntry, options);
+infScroll.observe(observedEl);
