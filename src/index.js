@@ -6,7 +6,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const formEl = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const observedEl = document.querySelector('.sentinel');
-// const buttonSubmit = formEl.querySelector('button');
 
 const picsApiService = new PicsApiService();
 
