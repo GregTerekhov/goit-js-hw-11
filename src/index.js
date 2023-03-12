@@ -35,9 +35,9 @@ function fetchResult() {
   renderByRequest();
 }
 
-function onCheckEmptyInput(totalHits) {
+function onCheckInput(totalHits) {
   if (picsApiService.query === '' || totalHits <= 2) {
-    // додав перевірку
+    // додав перевірку для totalHits тому, що ліміт за запитом на Pixabay складає від 3 картинок
     return Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
@@ -48,7 +48,7 @@ function onCheckEmptyInput(totalHits) {
 function renderByRequest() {
   picsApiService.fetchPics().then(({ hits, totalHits }) => {
     if (picsApiService.page === 1) {
-      onCheckEmptyInput(totalHits);
+      onCheckInput(totalHits);
     }
 
     appendPicsMarkup(hits);
