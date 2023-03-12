@@ -32,7 +32,7 @@ function onSearch(event) {
 
 function fetchResult() {
   infScroll.unobserve(observedEl);
-  renderByRequest();
+  renderOnRequest();
 }
 
 function onCheckInput(totalHits) {
@@ -45,7 +45,7 @@ function onCheckInput(totalHits) {
   Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
 }
 
-function renderByRequest() {
+function renderOnRequest() {
   picsApiService.fetchPics().then(({ hits, totalHits }) => {
     if (picsApiService.page === 1) {
       onCheckInput(totalHits);
@@ -116,7 +116,7 @@ const onEntry = entries => {
       if (picsApiService.page === 1) {
         return;
       }
-      renderByRequest();
+      renderOnRequest();
     }
   });
 };
