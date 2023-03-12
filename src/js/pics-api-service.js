@@ -2,8 +2,6 @@ import axios from 'axios';
 
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '33498062-ee2b42b41cbde2a2a11e8f88d';
-
-const controller = new AbortController();
 export class PicsApiService {
   constructor() {
     this.searchQuery = '';
@@ -19,17 +17,12 @@ export class PicsApiService {
       safesearch: true,
       per_page: 40,
       page: this.page,
-      signal: controller.signal,
     });
 
     try {
       const {
         data: { hits, totalHits },
       } = await axios.get(BASE_URL, { params });
-      // if (this.searchQuery === '') {
-      //   controller.abort();
-      //   return;
-      // }
 
       return { hits, totalHits };
     } catch (error) {

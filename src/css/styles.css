@@ -5,7 +5,8 @@ body {
 
 p {
   padding: 0;
-  margin: 8px 16px;
+  font-size: 14px;
+  /* margin: 8px 16px; */
 }
 
 button {
@@ -81,11 +82,19 @@ button {
 }
 
 .info {
-  display: grid;
-  grid-template-columns: 150px 172px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px;
+  text-align: center;
 }
 
-.load-more {
+.icon {
+  fill: currentColor;
+}
+
+/* .load-more {
   margin-top: 24px;
   background-color: #2f55ee;
   color: aliceblue;
@@ -103,4 +112,4 @@ button {
 
 .load-more.is-hidden {
   display: none;
-}
+} */
